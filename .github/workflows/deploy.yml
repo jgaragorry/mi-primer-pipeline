@@ -1,0 +1,42 @@
+# Nombre del Pipeline que aparecerá en la pestaña "Actions" de GitHub
+name: Desplegar Mi Sitio Web
+
+# Disparador: Este pipeline se ejecutará CADA VEZ que hagas un 'push' a la rama 'main'
+on:
+  push:
+    branches:
+      - main
+
+# Permisos: Le damos permiso al pipeline para escribir en nuestro repositorio (necesario para GitHub Pages)
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Trabajos (Jobs): Aquí definimos las tareas que se ejecutarán
+jobs:
+  # Definimos un único trabajo llamado 'deploy'
+  deploy:
+    # El tipo de máquina virtual donde se ejecutará. Usamos la última versión de Ubuntu.
+    runs-on: ubuntu-latest
+
+    # Los pasos (steps) que se ejecutarán secuencialmente
+    steps:
+      # Paso 1: Descargar el código de nuestro repositorio a la máquina virtual
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # Paso 2: Configurar GitHub Pages
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      # Paso 3: Construir el sitio (para sitios estáticos como este, solo necesita empaquetar los archivos)
+      - name: Construir el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' # El punto indica que todo el contenido del repositorio es el sitio web
+
+      # Paso 4: Desplegar en GitHub Pages
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
